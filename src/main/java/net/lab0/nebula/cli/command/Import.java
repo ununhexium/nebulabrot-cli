@@ -5,9 +5,10 @@ import java.io.File;
 import joptsimple.OptionSpec;
 import net.lab0.nebula.cli.AbstractCommand;
 import net.lab0.nebula.cli.NebulaCLI;
+import net.lab0.nebula.cli.VerboseLevel;
+import net.lab0.nebula.cli.listener.CliGeneralListener;
+import net.lab0.nebula.cli.listener.CliQuadTreeManagerListener;
 import net.lab0.nebula.exception.ProjectException;
-import net.lab0.nebula.listener.ConsoleGeneralListener;
-import net.lab0.nebula.listener.ConsoleQuadTreeManagerListener;
 import net.lab0.nebula.project.Project;
 
 public class Import
@@ -35,36 +36,22 @@ extends AbstractCommand
         {
             try
             {
-                ConsoleGeneralListener generalListener = null;
-                if (NebulaCLI.getVerbosityLevel() > 2)
-                {
-                    generalListener = new ConsoleGeneralListener();
-                }
-                ConsoleQuadTreeManagerListener quadTreeListener = null;
-                if (NebulaCLI.getVerbosityLevel() > 3)
-                {
-                    quadTreeListener = new ConsoleQuadTreeManagerListener();
-                }
+                CliGeneralListener generalListener = null;
+                generalListener = new CliGeneralListener(VerboseLevel.INFO);
+                
+                CliQuadTreeManagerListener quadTreeListener = null;
+                quadTreeListener = new CliQuadTreeManagerListener();
                 
                 project.importQuadTree(sourceFile.value(opt).toPath(), maxDepth.value(opt), quadTreeListener,
                 generalListener);
                 
-                if (NebulaCLI.getVerbosityLevel() > 0)
-                {
-                    NebulaCLI.cliPrint("Imported " + sourceFile.value(opt));
-                }
+                NebulaCLI.cliPrint("Imported " + sourceFile.value(opt), VerboseLevel.INFO);
                 
                 return true;
             }
             catch (ProjectException e)
             {
-                NebulaCLI.cliPrint("Error while importing the quad tree into the project: ");
-                NebulaCLI.cliPrint(e.getMessage());
-                Throwable t = null;
-                while ((t = t.getCause()) != null)
-                {
-                    NebulaCLI.cliPrint(e.getMessage());
-                }
+                NebulaCLI.cliPrint("Error while importing the quad tree into the project: ", e, VerboseLevel.ERROR);
             }
         }
         else

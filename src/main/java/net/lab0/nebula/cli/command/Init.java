@@ -3,8 +3,15 @@ package net.lab0.nebula.cli.command;
 import joptsimple.OptionSpec;
 import net.lab0.nebula.cli.AbstractCommand;
 import net.lab0.nebula.cli.NebulaCLI;
+import net.lab0.nebula.cli.VerboseLevel;
 import net.lab0.nebula.project.Project;
 
+/**
+ * Initializes a project.
+ * 
+ * @author 116
+ * 
+ */
 public class Init
 extends AbstractCommand
 {
@@ -24,15 +31,12 @@ extends AbstractCommand
         project.getProjetInformation().name = name;
         if (project.isNewProject())
         {
-            if (NebulaCLI.getVerbosityLevel() > 0)
-            {
-                System.out.println("Project '" + name + "' created");
-            }
+            NebulaCLI.cliPrint("Project '" + name + "' created", VerboseLevel.INFO);
             return true;
         }
         else
         {
-            System.out.println("A project named '" + name + "' already exists.");
+            NebulaCLI.cliPrint("A project named '" + name + "' already exists.", VerboseLevel.WARN);
         }
         return false;
     }

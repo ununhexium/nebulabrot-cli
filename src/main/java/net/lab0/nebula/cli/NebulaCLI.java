@@ -13,12 +13,14 @@ import javax.xml.bind.JAXBException;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
+import net.lab0.nebula.cli.command.Cut;
 import net.lab0.nebula.cli.command.Import;
 import net.lab0.nebula.cli.command.Init;
 import net.lab0.nebula.exception.NonEmptyFolderException;
 import net.lab0.nebula.exception.ProjectException;
 import net.lab0.nebula.project.Project;
 import net.lab0.tools.Pair;
+import net.lab0.tools.Throwables;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,25 +32,23 @@ import com.google.common.collect.Sets;
  */
 public class NebulaCLI
 {
-    private static final OptionParser        parser      = new OptionParser();
-    private static OptionSet                 opt;
+    private static final OptionParser             parser           = new OptionParser();
+    private static OptionSet                      opt;
+    
+    private static VerboseLevel                   defaultVerbosity = VerboseLevel.WARN;
     
     // general parameters
-    private static final OptionSpec<String>  projectPath = parser.accepts("path", "The path to the project")
-                                                         .withRequiredArg().defaultsTo(".");
+    private static final OptionSpec<String>       projectPath      = parser.accepts("path", "The path to the project")
+                                                                   .withRequiredArg().defaultsTo(".");
     
-    private static final OptionSpec<Integer> verbosity   = parser
-                                                         .acceptsAll(
-                                                         Arrays.asList("verbose", "v"),
-                                                         "The verbosity level,"
-                                                         + " starting at 0 (minimal output: high level errors),"
-                                                         + " 1 (high level status),"
-                                                         + " 2 (low level status, high level progress),"
-                                                         + " 3(low level progress). -1 for no output.")
-                                                         .withRequiredArg().ofType(Integer.class).defaultsTo(0);
+    private static final OptionSpec<VerboseLevel> verbosity        = parser
+                                                                   .acceptsAll(Arrays.asList("verbose", "v"),
+                                                                   "The verbosity level: " + VerboseLevel.toHelp())
+                                                                   .withRequiredArg().ofType(VerboseLevel.class)
+                                                                   .defaultsTo(defaultVerbosity);
     
-    private static Map<String, BaseCommand>  commands    = new HashMap<>();
-    private static Logger                    log         = LoggerFactory.getLogger(NebulaCLI.class);
+    private static Map<String, BaseCommand>       commands         = new HashMap<>();
+    private static Logger                         log              = LoggerFactory.getLogger(NebulaCLI.class);
     
     public static void main(String[] args)
     throws IOException
@@ -57,16 +57,16 @@ public class NebulaCLI
         {
             log.debug("Start");
             
-            log.trace("Base commands parsing");
+            log.debug("Base commands parsing");
             Pair<String[], String[]> splitArgs = parseBaseCommands(args);
             
-            log.trace("Configuring global parser");
+            log.debug("Configuring global parser");
             configureParser(parser);
             
-            log.trace("Parsing");
+            log.debug("Parsing");
             opt = parser.parse(splitArgs.a);
             
-            log.trace("Open project");
+            log.debug("Open project");
             Project project = openProject();
             
             String command = splitArgs.b[0];
@@ -76,13 +76,16 @@ public class NebulaCLI
             
             if (modified)
             {
-                log.trace("Save project");
+                log.debug("Save project");
                 saveProject(project);
             }
         }
         catch (Exception e)
         {
-            net.lab0.tools.Throwables.printMessages(e);
+            for (String s : Throwables.getMessages(e))
+            {
+                cliPrint(s, VerboseLevel.ERROR);
+            }
             log.error("Caught error in main", e);
         }
     }
@@ -99,8 +102,9 @@ public class NebulaCLI
         if (validCommands.size() == 0)
         {
             String[] commandsArray = availableCommands.toArray(new String[availableCommands.size()]);
-            cliPrint("You didn't specify any command. Available commands are: " + Arrays.toString(commandsArray));
-            cliPrint("Global options are");
+            cliPrint("You didn't specify any command. Available commands are: " + Arrays.toString(commandsArray),
+            VerboseLevel.FATAL);
+            cliPrint("Global options are", VerboseLevel.INFO);
             cliPrintHelp(parser);
             System.exit(1);
             return null;
@@ -141,6 +145,7 @@ public class NebulaCLI
     {
         addCommand(new Init());
         addCommand(new Import());
+        addCommand(new Cut());
     }
     
     private static void addCommand(BaseCommand command)
@@ -187,17 +192,98 @@ public class NebulaCLI
         parser.acceptsAll(Arrays.asList("h", "help"), "Help").forHelp();
     }
     
-    public static void cliPrint(String s)
+    public static void cliPrint(String s, VerboseLevel severity)
     {
-        log.info(s);
-        if (verbosity.value(opt) > -1)
+        if (severity.eq(VerboseLevel.OFF))
         {
-            // System.out.println(s);
+            log.warn("INTERNAL A message cannot be logged with a severity of OFF -> changed to TRACE");
+            severity = VerboseLevel.TRACE;
         }
         
+        logOutput(s, severity);
+        
+        printOutput(s, severity);
     }
     
-    public static int getVerbosityLevel()
+    private static void printOutput(String s, VerboseLevel severity)
+    {
+        if (shouldPrint(severity))
+        {
+            if (severity.eq(VerboseLevel.WARN))
+            {
+                System.out.print("WW ");
+            }
+            if (severity.eq(VerboseLevel.ERROR))
+            {
+                System.out.print("EE ");
+            }
+            if (severity.eq(VerboseLevel.FATAL))
+            {
+                System.out.print("FF ");
+            }
+            System.out.println(s);
+        }
+    }
+
+    public static boolean shouldPrint(VerboseLevel severity)
+    {
+        VerboseLevel verbosity = null;
+        // this happens when we want to print something before the main args are parsed
+        if (opt == null)
+        {
+            verbosity = VerboseLevel.ALL;
+        }
+        else
+        {
+            verbosity = NebulaCLI.verbosity.value(opt);
+        }
+        return (severity).gte(verbosity);
+    }
+    
+    private static void logOutput(String s, VerboseLevel severity)
+    {
+        switch (severity)
+        {
+            case ALL:
+            case TRACE:
+                log.trace(s);
+                break;
+            
+            case DEBUG:
+            case PROGRESS:
+                log.debug(s);
+                break;
+            
+            case DETAIL:
+            case INFO:
+                log.info(s);
+                break;
+            
+            case WARN:
+                log.warn(s);
+                break;
+            
+            case ERROR:
+            case FATAL:
+                log.error(s);
+                break;
+            
+            case OFF:
+            default:
+                break;
+        }
+    }
+    
+    public static void cliPrint(String s, Throwable t, VerboseLevel level)
+    {
+        cliPrint(s, level);
+        for (String msg : Throwables.getMessages(t))
+        {
+            cliPrint(msg, level);
+        }
+    }
+    
+    public static VerboseLevel getVerbosityLevel()
     {
         return opt.valueOf(NebulaCLI.verbosity);
     }
@@ -211,10 +297,7 @@ public class NebulaCLI
     {
         try
         {
-            if (verbosity.value(opt) > -1)
-            {
-                parser.printHelpOn(System.out);
-            }
+            parser.printHelpOn(System.out);
         }
         catch (IOException e)
         {

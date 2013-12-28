@@ -20,4 +20,6 @@ public interface BaseCommand
      * @return <code>true</code> if the project was modified after the run of the command
      */
     public boolean execute(Project project);
+    
+    public boolean askedForHelp();
 }

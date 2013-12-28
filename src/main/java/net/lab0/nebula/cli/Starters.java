@@ -7,22 +7,28 @@ import java.util.Scanner;
 
 public class Starters
 {
+    private static final String NEBULA_PROJECT_PATH = "R:\\dev\\nebula\\project";
+    
     public static void main(String[] args)
     throws Exception
     {
         LinkedHashMap<String, String[]> commands = new LinkedHashMap<>();
         
         // init
-        commands.put("init", new String[] { "--path", "R:\\dev\\nebula\\project", "init", "--name", "Testing" });
+        commands.put("init", new String[] { "--path", NEBULA_PROJECT_PATH, "init", "--name", "Testing" });
         
         // import
-        commands.put("import", new String[] { "--path", "R:\\dev\\nebula\\project", "--verbose", "PROGRESS", "import",
+        commands.put("import", new String[] { "--path", NEBULA_PROJECT_PATH, "--verbose", "PROGRESS", "import",
                 "--path", "R:\\dev\\nebula\\tree\\bin\\out", "--quad-tree", "--max-depth", "6" });
         
         // cut
-        commands.put("cut", new String[] { "--path", "R:\\dev\\nebula\\project", "--verbose", "PROGRESS", "cut",
-                "--in", "R:\\dev\\nebula\\tree\\bin\\p256i65536d5D16binNoIndex", "--out",
-                "R:\\dev\\nebula\\tree\\bin\\out", "--depth", "7" });
+        commands.put("cut", new String[] { "--path", NEBULA_PROJECT_PATH, "--verbose", "PROGRESS", "cut", "--in",
+                "R:\\dev\\nebula\\tree\\bin\\p256i65536d5D16binNoIndex", "--out", "R:\\dev\\nebula\\tree\\bin\\out",
+                "--depth", "7" });
+        
+        // compute
+        commands.put("comp", new String[] { "--path", NEBULA_PROJECT_PATH, "nebula", "compute", "--points", "--power",
+                "17", "--max-depth", "10", "--max-iter", "65536", "--min-iter", "64", "--size", "4096", "--tree", "1" });
         
         String choice = "";
         
@@ -43,7 +49,6 @@ public class Starters
                 {
                     NebulaCLI.main(command);
                 }
-                
             }
         }
         

@@ -13,9 +13,12 @@ import javax.xml.bind.JAXBException;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
+import net.lab0.nebula.cli.command.Compute;
 import net.lab0.nebula.cli.command.Cut;
 import net.lab0.nebula.cli.command.Import;
+import net.lab0.nebula.cli.command.Info;
 import net.lab0.nebula.cli.command.Init;
+import net.lab0.nebula.cli.command.Split;
 import net.lab0.nebula.exception.NonEmptyFolderException;
 import net.lab0.nebula.exception.ProjectException;
 import net.lab0.nebula.project.Project;
@@ -35,7 +38,7 @@ public class NebulaCLI
     private static final OptionParser             parser           = new OptionParser();
     private static OptionSet                      opt;
     
-    private static VerboseLevel                   defaultVerbosity = VerboseLevel.WARN;
+    private static VerboseLevel                   defaultVerbosity = VerboseLevel.OFF;
     
     // general parameters
     private static final OptionSpec<String>       projectPath      = parser.accepts("path", "The path to the project")
@@ -65,20 +68,18 @@ public class NebulaCLI
             
             log.debug("Parsing");
             opt = parser.parse(splitArgs.a);
-            
-            log.debug("Open project");
-            Project project = openProject();
-            
-            String command = splitArgs.b[0];
-            String[] commandArgs = Arrays.copyOfRange(splitArgs.b, 1, splitArgs.b.length);
-            commands.get(command).parse(commandArgs);
-            boolean modified = commands.get(command).execute(project);
-            
-            if (modified)
+            if (opt.has("help"))
             {
-                log.debug("Save project");
-                saveProject(project);
+                cliPrintHelp(parser);
             }
+            else
+            {
+                parseAndExecuteCommand(splitArgs);
+            }
+        }
+        catch (joptsimple.OptionException e)
+        {
+            NebulaCLI.cliPrint("Error while parsing the command line", e, VerboseLevel.ERROR);
         }
         catch (Exception e)
         {
@@ -87,6 +88,24 @@ public class NebulaCLI
                 cliPrint(s, VerboseLevel.ERROR);
             }
             log.error("Caught error in main", e);
+        }
+    }
+
+    private static void parseAndExecuteCommand(Pair<String[], String[]> splitArgs)
+    {
+        String command = splitArgs.b[0];
+        String[] commandArgs = Arrays.copyOfRange(splitArgs.b, 1, splitArgs.b.length);
+        commands.get(command).parse(commandArgs);
+        if (!commands.get(command).askedForHelp())
+        {
+            log.debug("Open project");
+            Project project = openProject();
+            boolean modified = commands.get(command).execute(project);
+            if (modified)
+            {
+                log.debug("Save project");
+                saveProject(project);
+            }
         }
     }
     
@@ -103,7 +122,7 @@ public class NebulaCLI
         {
             String[] commandsArray = availableCommands.toArray(new String[availableCommands.size()]);
             cliPrint("You didn't specify any command. Available commands are: " + Arrays.toString(commandsArray),
-            VerboseLevel.FATAL);
+            VerboseLevel.ERROR);
             cliPrint("Global options are", VerboseLevel.INFO);
             cliPrintHelp(parser);
             System.exit(1);
@@ -143,9 +162,12 @@ public class NebulaCLI
      */
     private static void registerCommands()
     {
+        addCommand(new Compute());
+        addCommand(new Cut());
+        addCommand(new Info());
         addCommand(new Init());
         addCommand(new Import());
-        addCommand(new Cut());
+        addCommand(new Split());
     }
     
     private static void addCommand(BaseCommand command)
@@ -213,18 +235,30 @@ public class NebulaCLI
             {
                 System.out.print("WW ");
             }
-            if (severity.eq(VerboseLevel.ERROR))
+            else if (severity.eq(VerboseLevel.ERROR))
             {
                 System.out.print("EE ");
             }
-            if (severity.eq(VerboseLevel.FATAL))
+            else if (severity.eq(VerboseLevel.FATAL))
             {
                 System.out.print("FF ");
+            }
+            else {
+                System.out.print("   ");
             }
             System.out.println(s);
         }
     }
-
+    
+    public static void cliPrint(String s, Throwable t, VerboseLevel level)
+    {
+        cliPrint(s, level);
+        for (String msg : Throwables.getMessages(t))
+        {
+            cliPrint(msg, level);
+        }
+    }
+    
     public static boolean shouldPrint(VerboseLevel severity)
     {
         VerboseLevel verbosity = null;
@@ -271,15 +305,6 @@ public class NebulaCLI
             case OFF:
             default:
                 break;
-        }
-    }
-    
-    public static void cliPrint(String s, Throwable t, VerboseLevel level)
-    {
-        cliPrint(s, level);
-        for (String msg : Throwables.getMessages(t))
-        {
-            cliPrint(msg, level);
         }
     }
     

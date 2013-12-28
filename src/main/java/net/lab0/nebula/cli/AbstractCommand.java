@@ -1,5 +1,7 @@
 package net.lab0.nebula.cli;
 
+import java.io.IOException;
+
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 
@@ -26,5 +28,22 @@ implements BaseCommand
     public void parse(String... args)
     {
         opt = parser.parse(args);
+        if (askedForHelp())
+        {
+            try
+            {
+                parser.printHelpOn(System.out);
+            }
+            catch (IOException e)
+            {
+                NebulaCLI.cliPrint("Was not able to display the help message for the command " + this.getClass(), e,
+                VerboseLevel.WARN);
+            }
+        }
+    }
+    
+    public boolean askedForHelp()
+    {
+        return opt.has("help");
     }
 }

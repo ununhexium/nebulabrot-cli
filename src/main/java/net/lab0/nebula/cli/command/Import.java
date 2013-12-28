@@ -21,12 +21,12 @@ extends AbstractCommand
     {
         super("import");
         
-        maxDepth = parser.accepts("max-depth", "Specifies the maximum depth to use at the import").withRequiredArg()
+        maxDepth = parser.accepts("max-depth", "Specifies the maximum depth (inclusive) to use at the import").withRequiredArg()
         .ofType(Integer.class).defaultsTo(Integer.MAX_VALUE);
         parser.accepts("quad-tree", "The imported element is a quad tree").requiredIf("max-depth");
         
         sourceFile = parser.accepts("path", "Path to the file to import").requiredIf("quad-tree").withRequiredArg()
-        .describedAs("the absolute or relative file path").ofType(File.class);
+        .describedAs("the absolute or relative file path").ofType(File.class).required();
     }
     
     @Override
@@ -37,7 +37,7 @@ extends AbstractCommand
             try
             {
                 CliGeneralListener generalListener = null;
-                generalListener = new CliGeneralListener(VerboseLevel.INFO);
+                generalListener = new CliGeneralListener(VerboseLevel.DETAIL);
                 
                 CliQuadTreeManagerListener quadTreeListener = null;
                 quadTreeListener = new CliQuadTreeManagerListener();

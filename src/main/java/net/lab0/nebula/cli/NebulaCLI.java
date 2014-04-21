@@ -13,7 +13,8 @@ import javax.xml.bind.JAXBException;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
-import net.lab0.nebula.cli.command.Compute;
+import net.lab0.nebula.cli.command.ComputeNebula;
+import net.lab0.nebula.cli.command.ComputePoints;
 import net.lab0.nebula.cli.command.Cut;
 import net.lab0.nebula.cli.command.Import;
 import net.lab0.nebula.cli.command.Info;
@@ -58,7 +59,7 @@ public class NebulaCLI
     {
         try
         {
-            log.debug("Start");
+            log.debug("Start v0.0.0.1");
             
             log.debug("Base commands parsing");
             Pair<String[], String[]> splitArgs = parseBaseCommands(args);
@@ -89,6 +90,7 @@ public class NebulaCLI
             }
             log.error("Caught error in main", e);
         }
+        System.exit(0);//TODO Need to fix the thread pool executor
     }
 
     private static void parseAndExecuteCommand(Pair<String[], String[]> splitArgs)
@@ -162,12 +164,13 @@ public class NebulaCLI
      */
     private static void registerCommands()
     {
-        addCommand(new Compute());
+        addCommand(new ComputePoints());
         addCommand(new Cut());
         addCommand(new Info());
         addCommand(new Init());
         addCommand(new Import());
         addCommand(new Split());
+        addCommand(new ComputeNebula());
     }
     
     private static void addCommand(BaseCommand command)

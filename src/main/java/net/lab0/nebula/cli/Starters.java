@@ -7,7 +7,7 @@ import java.util.Scanner;
 
 public class Starters
 {
-    private static final String NEBULA_PROJECT_PATH = "R:\\dev\\nebula\\project";
+    private static final String NEBULA_PROJECT_PATH = "R:\\dev\\nebula\\cli\\test1";
     
     public static void main(String[] args)
     throws Exception
@@ -26,9 +26,14 @@ public class Starters
                 "R:\\dev\\nebula\\tree\\bin\\p256i65536d5D16binNoIndex", "--out", "R:\\dev\\nebula\\tree\\bin\\out",
                 "--depth", "7" });
         
-        // compute
+        // compute points
         commands.put("comp", new String[] { "--path", NEBULA_PROJECT_PATH, "nebula", "compute", "--points", "--power",
-                "17", "--max-depth", "10", "--max-iter", "65536", "--min-iter", "64", "--size", "4096", "--tree", "1" });
+                "12", "--max-depth", "8", "--max-iter", "65536", "--min-iter", "64", "--block-size", "4096", "--tree",
+                "1" });
+        
+        // compute nebula
+        commands.put("nebula", new String[] { "--path", NEBULA_PROJECT_PATH, "nebula", "--points", "9",
+                "--viewport", "2.0,2.0,-2.0,-2.0", "--x-res", "1024", "--y-res", "1024" });
         
         String choice = "";
         

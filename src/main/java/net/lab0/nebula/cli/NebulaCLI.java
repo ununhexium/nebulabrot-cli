@@ -90,7 +90,6 @@ public class NebulaCLI
             }
             log.error("Caught error in main", e);
         }
-        System.exit(0);//TODO Need to fix the thread pool executor
     }
 
     private static void parseAndExecuteCommand(Pair<String[], String[]> splitArgs)

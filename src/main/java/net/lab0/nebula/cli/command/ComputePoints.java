@@ -36,8 +36,9 @@ extends AbstractCommand
         powerOf2 = parser.accepts("power", pointsDesc).withRequiredArg().ofType(Integer.class)
         .describedAs("max value: 52");
         
-        blockSize = parser.accepts("block-size", "The size of block that should be used").withRequiredArg()
-        .ofType(Integer.class);
+        blockSize = parser
+        .accepts("block-size", "The size of block that should be used when reading points to compte from the source")
+        .withRequiredArg().ofType(Integer.class);
         
         maxDepth = parser.accepts("max-depth", "The maximum depth that should be used (inclusive)").withRequiredArg()
         .ofType(Integer.class).defaultsTo(256);

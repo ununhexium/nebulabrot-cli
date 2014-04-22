@@ -16,9 +16,12 @@ public class ComputeNebula
 extends AbstractCommand
 {
     private OptionSpec<Integer> pointsId;
-    private OptionSpec<Double> viewport;
+    private OptionSpec<Double>  viewport;
     private OptionSpec<Integer> xRes;
     private OptionSpec<Integer> yRes;
+    private OptionSpec<Long>    maxIter;
+    private OptionSpec<Long>    minIter;
+    private OptionSpec<String>  imageName;
     
     public ComputeNebula()
     {
@@ -35,6 +38,15 @@ extends AbstractCommand
         
         yRes = parser.accepts("y-res", "The height of the ouput image").withRequiredArg().ofType(Integer.class)
         .describedAs("Y resolution");
+        
+        maxIter = parser.accepts("max-iter", "The maximum iteration to reach while computing").withRequiredArg()
+        .ofType(Long.class).defaultsTo(Long.MAX_VALUE);
+        
+        minIter = parser.accepts("min-iter", "The minimum iteration to reach while computing").withRequiredArg()
+        .ofType(Long.class).defaultsTo(-1L);
+        
+        imageName = parser.accepts("name", "The name to give to the ouput image").withRequiredArg()
+        .ofType(String.class).defaultsTo("final");
     }
     
     @Override
@@ -53,7 +65,8 @@ extends AbstractCommand
         
         try
         {
-            project.computeNebula(pointsId.value(opt), viewPort, xRes.value(opt), yRes.value(opt));
+            project.computeNebula(pointsId.value(opt), viewPort, xRes.value(opt), yRes.value(opt), minIter.value(opt),
+            maxIter.value(opt), imageName.value(opt));
         }
         catch (Exception e)
         {

@@ -1,5 +1,6 @@
 package net.lab0.nebula.cli.command;
 
+import java.io.IOException;
 import java.util.List;
 
 import joptsimple.OptionSpec;
@@ -11,6 +12,7 @@ import net.lab0.tools.geom.Point;
 import net.lab0.tools.geom.PointInterface;
 import net.lab0.tools.geom.Rectangle;
 import net.lab0.tools.geom.RectangleInterface;
+import nu.xom.ParsingException;
 
 public class ComputeNebula
 extends AbstractCommand
@@ -22,6 +24,8 @@ extends AbstractCommand
     private OptionSpec<Long>    maxIter;
     private OptionSpec<Long>    minIter;
     private OptionSpec<String>  imageName;
+    
+    private OptionSpec<Integer> sum;
     
     public ComputeNebula()
     {
@@ -47,10 +51,38 @@ extends AbstractCommand
         
         imageName = parser.accepts("name", "The name to give to the ouput image").withRequiredArg()
         .ofType(String.class).defaultsTo("final");
+        
+        sum = parser.accepts("sum", "Sums a set of nebulabrot renderings").withRequiredArg().ofType(Integer.class);
     }
     
     @Override
     public boolean execute(Project project)
+    {
+        if (opt.has(sum))
+        {
+            sum(project);
+        }
+        else
+        {
+            compute(project);
+        }
+        
+        return false;
+    }
+    
+    private void sum(Project project)
+    {
+        try
+        {
+            project.sumNebulas(opt.valueOf(sum));
+        }
+        catch (ParsingException | IOException e)
+        {
+            NebulaCLI.cliPrint("Error while summing the results", e, VerboseLevel.ERROR);
+        }
+    }
+
+    private void compute(Project project)
     {
         List<Double> coordinates = viewport.values(opt);
         
@@ -72,8 +104,6 @@ extends AbstractCommand
         {
             NebulaCLI.cliPrint("Error while computing", e, VerboseLevel.ERROR);
         }
-        
-        return false;
     }
     
 }

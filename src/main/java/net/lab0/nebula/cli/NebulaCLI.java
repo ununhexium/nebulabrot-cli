@@ -13,9 +13,11 @@ import javax.xml.bind.JAXBException;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
+import net.lab0.nebula.cli.command.XZcat;
 import net.lab0.nebula.cli.command.ComputeNebula;
 import net.lab0.nebula.cli.command.ComputePoints;
 import net.lab0.nebula.cli.command.Cut;
+import net.lab0.nebula.cli.command.Image;
 import net.lab0.nebula.cli.command.Import;
 import net.lab0.nebula.cli.command.Info;
 import net.lab0.nebula.cli.command.Init;
@@ -163,13 +165,15 @@ public class NebulaCLI
      */
     private static void registerCommands()
     {
+        addCommand(new ComputeNebula());
         addCommand(new ComputePoints());
         addCommand(new Cut());
+        addCommand(new Image());
         addCommand(new Info());
         addCommand(new Init());
         addCommand(new Import());
         addCommand(new Split());
-        addCommand(new ComputeNebula());
+        addCommand(new XZcat());
     }
     
     private static void addCommand(BaseCommand command)

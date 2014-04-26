@@ -55,6 +55,7 @@ extends AbstractCommand
         {
             NebulaCLI.cliPrint("Was not able to load the source quad tree at " + input.value(opt).getAbsolutePath(), e,
             VerboseLevel.ERROR);
+            return false;
         }
         
         // step 2: check the cut depth, should be useless
@@ -74,6 +75,7 @@ extends AbstractCommand
         {
             NebulaCLI.cliPrint("Was not able to save the quad tree to " + output.value(opt).getAbsolutePath(), e,
             VerboseLevel.ERROR);
+            return false;
         }
         return false;
     }

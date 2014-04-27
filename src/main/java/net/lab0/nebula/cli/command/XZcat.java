@@ -1,9 +1,21 @@
 package net.lab0.nebula.cli.command;
 
+import java.io.IOException;
+import java.nio.file.Path;
+
 import joptsimple.OptionSpec;
 import net.lab0.nebula.cli.AbstractCommand;
+import net.lab0.nebula.cli.NebulaCLI;
+import net.lab0.nebula.cli.VerboseLevel;
 import net.lab0.nebula.project.Project;
 
+/**
+ * 
+ * Class to handle the concatenation of XZ files for points data sets
+ * 
+ * @author 116@lab0.net
+ * 
+ */
 public class XZcat
 extends AbstractCommand
 {
@@ -38,6 +50,8 @@ extends AbstractCommand
                 {
                     case "TB":
                         bytes *= 1024L;
+                    case "GB":
+                        bytes *= 1024L;
                     case "MB":
                         bytes *= 1024L;
                     case "kB":
@@ -47,8 +61,17 @@ extends AbstractCommand
                 }
             }
             
-            System.out.println(size);
-            project.concatenatePoints(opt.valueOf(pointsId), bytes);
+            Path out;
+            try
+            {
+                out = project.concatenatePoints(opt.valueOf(pointsId), bytes);
+                NebulaCLI.cliPrint("The was concatenated to: " + out.toAbsolutePath(), VerboseLevel.INFO);
+            }
+            catch (IOException e)
+            {
+                NebulaCLI.cliPrint("Error while aggregating the points' data", e, VerboseLevel.INFO);
+            }
+            
         }
         return false;
     }

@@ -11,6 +11,12 @@ import net.lab0.nebula.cli.VerboseLevel;
 import net.lab0.nebula.project.Project;
 import net.lab0.nebula.project.QuadTreeInformation;
 
+/**
+ * Display quick information about this project.
+ * 
+ * @author 116@lab0.net
+ * 
+ */
 public class Info
 extends AbstractCommand
 {

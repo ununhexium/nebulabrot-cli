@@ -11,6 +11,12 @@ import net.lab0.nebula.cli.listener.CliQuadTreeManagerListener;
 import net.lab0.nebula.exception.ProjectException;
 import net.lab0.nebula.project.Project;
 
+/**
+ * Import a quad tree into this project
+ * 
+ * @author 116@lab0.net
+ * 
+ */
 public class Import
 extends AbstractCommand
 {
@@ -21,8 +27,8 @@ extends AbstractCommand
     {
         super("import");
         
-        maxDepth = parser.accepts("max-depth", "Specifies the maximum depth (inclusive) to use at the import").withRequiredArg()
-        .ofType(Integer.class).defaultsTo(Integer.MAX_VALUE);
+        maxDepth = parser.accepts("max-depth", "Specifies the maximum depth (inclusive) to use at the import")
+        .withRequiredArg().ofType(Integer.class).defaultsTo(Integer.MAX_VALUE);
         parser.accepts("quad-tree", "The imported element is a quad tree").requiredIf("max-depth");
         
         sourceFile = parser.accepts("path", "Path to the file to import").requiredIf("quad-tree").withRequiredArg()

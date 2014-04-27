@@ -14,6 +14,12 @@ import net.lab0.tools.geom.Rectangle;
 import net.lab0.tools.geom.RectangleInterface;
 import nu.xom.ParsingException;
 
+/**
+ * Command to compute the nebula rendering of a set of points
+ * 
+ * @author 116@lab0.net
+ * 
+ */
 public class ComputeNebula
 extends AbstractCommand
 {
@@ -81,7 +87,7 @@ extends AbstractCommand
             NebulaCLI.cliPrint("Error while summing the results", e, VerboseLevel.ERROR);
         }
     }
-
+    
     private void compute(Project project)
     {
         List<Double> coordinates = viewport.values(opt);

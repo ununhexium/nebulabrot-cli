@@ -5,6 +5,12 @@ import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 import java.util.Scanner;
 
+/**
+ * Class to start the CLI in debug mode
+ * 
+ * @author 116@lab0.net
+ * 
+ */
 public class Starters
 {
     private static final String NEBULA_PROJECT_PATH = "R:\\dev\\nebula\\cli\\test1";
@@ -32,8 +38,12 @@ public class Starters
                 "1" });
         
         // compute nebula
-        commands.put("nebula", new String[] { "--path", NEBULA_PROJECT_PATH, "nebula", "--points", "9",
-                "--viewport", "2.0,2.0,-2.0,-2.0", "--x-res", "1024", "--y-res", "1024" });
+        commands.put("nebula", new String[] { "--path", NEBULA_PROJECT_PATH, "nebula", "--points", "9", "--viewport",
+                "2.0,2.0,-2.0,-2.0", "--x-res", "1024", "--y-res", "1024" });
+        
+        // xzcat
+        commands.put("xzcat", new String[] { "--path", NEBULA_PROJECT_PATH, "xzcat", "--points", "1", "--size", "200",
+                "--unit", "MB" });
         
         String choice = "";
         

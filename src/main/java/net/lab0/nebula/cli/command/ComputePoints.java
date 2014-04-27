@@ -12,6 +12,12 @@ import net.lab0.nebula.project.ComputingRoutine;
 import net.lab0.nebula.project.PointsComputingParameters;
 import net.lab0.nebula.project.Project;
 
+/**
+ * Command to compute the points set with the help of an indexation quad tree
+ * 
+ * @author 116@lab0.net
+ * 
+ */
 public class ComputePoints
 extends AbstractCommand
 {

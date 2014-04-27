@@ -2,19 +2,51 @@ package net.lab0.nebula.cli;
 
 public enum VerboseLevel
 {
+    /**
+     * Log all messages. This is not a valid severity level for messages
+     */
     ALL,
-    TRACE, // detailed debug
+    /**
+     * Detailed debug
+     */
+    TRACE,
+    /**
+     * Debug messages
+     */
     DEBUG,
-    PROGRESS, // progression information
-    DETAIL, // more precise info
+    /**
+     * progression information
+     */
+    PROGRESS,
+    /**
+     * more precise info
+     */
+    DETAIL,
+    /**
+     * Information messages
+     */
     INFO,
-    WARN, // non blocking error
+    /**
+     * non blocking error
+     */
+    WARN,
+    /**
+     * A programm error
+     */
     ERROR,
-    FATAL, // non user/program error (system/os error)
+    /**
+     * non user, non program error (system/os error)
+     */
+    FATAL,
+    /**
+     * No message at all
+     */
     OFF, ;
     
     /**
-     * Greater than
+     * @param other
+     *            Antoher severity level
+     * @return <code>true</code> if greater than
      */
     public boolean gt(VerboseLevel other)
     {
@@ -22,7 +54,9 @@ public enum VerboseLevel
     }
     
     /**
-     * Less than
+     * @param other
+     *            Antoher severity level
+     * @return <code>true</code> if less than
      */
     public boolean lt(VerboseLevel other)
     {
@@ -30,7 +64,9 @@ public enum VerboseLevel
     }
     
     /**
-     * Greater than or equal to
+     * @param other
+     *            Antoher severity level
+     * @return <code>true</code> if greater than or equal to
      */
     public boolean gte(VerboseLevel other)
     {
@@ -38,7 +74,9 @@ public enum VerboseLevel
     }
     
     /**
-     * Less than or equal to
+     * @param other
+     *            Antoher severity level
+     * @return <code>true</code> if less than or equal to
      */
     public boolean lte(VerboseLevel other)
     {
@@ -46,13 +84,18 @@ public enum VerboseLevel
     }
     
     /**
-     * equals
+     * @param other
+     *            Antoher severity level
+     * @return <code>true</code> if equals
      */
     public boolean eq(VerboseLevel other)
     {
         return this.ordinal() == other.ordinal();
     }
     
+    /**
+     * @return A string of the available severity levels
+     */
     public static String toHelp()
     {
         StringBuilder stringBuilder = new StringBuilder();

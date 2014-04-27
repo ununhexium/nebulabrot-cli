@@ -8,11 +8,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import javax.print.attribute.standard.Severity;
 import javax.xml.bind.JAXBException;
 
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
+import net.lab0.nebula.cli.command.XZ;
 import net.lab0.nebula.cli.command.XZcat;
 import net.lab0.nebula.cli.command.ComputeNebula;
 import net.lab0.nebula.cli.command.ComputePoints;
@@ -31,6 +33,7 @@ import net.lab0.tools.Throwables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Stopwatch;
 import com.google.common.collect.Sets;
 
 /**
@@ -61,6 +64,9 @@ public class NebulaCLI
     {
         try
         {
+            // measure the time of each command
+            Stopwatch stopwatch = Stopwatch.createStarted();
+            
             log.debug("Start v0.0.0.1");
             
             log.debug("Base commands parsing");
@@ -79,6 +85,10 @@ public class NebulaCLI
             {
                 parseAndExecuteCommand(splitArgs);
             }
+            
+            stopwatch.stop();
+            
+            System.out.println(stopwatch);
         }
         catch (joptsimple.OptionException e)
         {
@@ -93,7 +103,20 @@ public class NebulaCLI
             log.error("Caught error in main", e);
         }
     }
-
+    
+    /**
+     * Enables options for the parser: posix naming conventions, no alternative long options, -h and --help for help.
+     * 
+     * @param parser
+     *            The parser to configure
+     */
+    public static void configureParser(OptionParser parser)
+    {
+        parser.posixlyCorrect(true);
+        parser.recognizeAlternativeLongOptions(false);
+        parser.acceptsAll(Arrays.asList("h", "help"), "Help").forHelp();
+    }
+    
     private static void parseAndExecuteCommand(Pair<String[], String[]> splitArgs)
     {
         String command = splitArgs.b[0];
@@ -112,6 +135,14 @@ public class NebulaCLI
         }
     }
     
+    /**
+     * Parses the input arguments, splitting the main program's options into 2: the main programm's (nebula) options ;
+     * and the subcommand's and its options
+     * 
+     * @param args
+     *            The input arguments of the <code>main</code> function
+     * @return A pair of 2 string arrays: &gt;main options, command+options&lt;
+     */
     private static Pair<String[], String[]> parseBaseCommands(String... args)
     {
         registerCommands();
@@ -173,6 +204,7 @@ public class NebulaCLI
         addCommand(new Init());
         addCommand(new Import());
         addCommand(new Split());
+        addCommand(new XZ());
         addCommand(new XZcat());
     }
     
@@ -190,7 +222,6 @@ public class NebulaCLI
         catch (JAXBException e)
         {
             log.error("Error while saving the project", e);
-            System.exit(1);
         }
     }
     
@@ -212,14 +243,14 @@ public class NebulaCLI
         return null;
     }
     
-    public static void configureParser(OptionParser parser)
-    {
-        parser.posixlyCorrect(true);
-        parser.recognizeAlternativeLongOptions(false);
-        
-        parser.acceptsAll(Arrays.asList("h", "help"), "Help").forHelp();
-    }
-    
+    /**
+     * Standard print method
+     * 
+     * @param s
+     *            The string to print
+     * @param severity
+     *            The severity level associated to the printed message
+     */
     public static void cliPrint(String s, VerboseLevel severity)
     {
         if (severity.eq(VerboseLevel.OFF))
@@ -249,13 +280,24 @@ public class NebulaCLI
             {
                 System.out.print("FF ");
             }
-            else {
+            else
+            {
                 System.out.print("   ");
             }
             System.out.println(s);
         }
     }
     
+    /**
+     * Print method for exceptions
+     * 
+     * @param s
+     *            The string to print
+     * @param t
+     *            The throwable that will be logged with the message
+     * @param level
+     *            The severity level associated to the printed message
+     */
     public static void cliPrint(String s, Throwable t, VerboseLevel level)
     {
         cliPrint(s, level);
@@ -265,11 +307,15 @@ public class NebulaCLI
         }
     }
     
+    /**
+     * @param severity
+     * @return <code>true</code> if a message of {@code severity} level should be printed.
+     */
     public static boolean shouldPrint(VerboseLevel severity)
     {
         VerboseLevel verbosity = null;
         // this happens when we want to print something before the main args are parsed
-        if (opt == null)
+        if (!opt.has(NebulaCLI.verbosity))
         {
             verbosity = VerboseLevel.ALL;
         }
@@ -280,6 +326,12 @@ public class NebulaCLI
         return (severity).gte(verbosity);
     }
     
+    /**
+     * Log with the appropriate logging function depending on the severity level
+     * 
+     * @param s
+     * @param severity
+     */
     private static void logOutput(String s, VerboseLevel severity)
     {
         switch (severity)

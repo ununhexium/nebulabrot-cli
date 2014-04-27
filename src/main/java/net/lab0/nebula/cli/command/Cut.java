@@ -17,6 +17,12 @@ import net.lab0.nebula.listener.QuadTreeManagerListener;
 import net.lab0.nebula.project.Project;
 import nu.xom.ParsingException;
 
+/**
+ * Command to cut a tree to a lower depth
+ * 
+ * @author 116@lab0.net
+ * 
+ */
 @SuppressWarnings("deprecation")
 public class Cut
 extends AbstractCommand
@@ -29,10 +35,10 @@ extends AbstractCommand
     {
         super("cut");
         
-        input = parser.acceptsAll(Arrays.asList("in", "input"), "Quad tree input file").withRequiredArg().ofType(File.class)
-        .required().describedAs("A quad tree");
-        output = parser.acceptsAll(Arrays.asList("out", "output"), "Quad tree output file").withRequiredArg().ofType(File.class)
-        .required().describedAs("A quad tree");
+        input = parser.acceptsAll(Arrays.asList("in", "input"), "Quad tree input file").withRequiredArg()
+        .ofType(File.class).required().describedAs("A quad tree");
+        output = parser.acceptsAll(Arrays.asList("out", "output"), "Quad tree output file").withRequiredArg()
+        .ofType(File.class).required().describedAs("A quad tree");
         cutDepth = parser.accepts("depth", "The cut depth. The indicated depth is kept in the quad tree.")
         .withRequiredArg().ofType(Integer.class).required();
         parser.accepts("indexed", "Saves the file with indexation");

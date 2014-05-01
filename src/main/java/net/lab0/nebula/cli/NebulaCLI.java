@@ -8,14 +8,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import javax.print.attribute.standard.Severity;
 import javax.xml.bind.JAXBException;
 
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
-import net.lab0.nebula.cli.command.XZ;
-import net.lab0.nebula.cli.command.XZcat;
 import net.lab0.nebula.cli.command.ComputeNebula;
 import net.lab0.nebula.cli.command.ComputePoints;
 import net.lab0.nebula.cli.command.Cut;
@@ -24,6 +21,9 @@ import net.lab0.nebula.cli.command.Import;
 import net.lab0.nebula.cli.command.Info;
 import net.lab0.nebula.cli.command.Init;
 import net.lab0.nebula.cli.command.Split;
+import net.lab0.nebula.cli.command.Statistics;
+import net.lab0.nebula.cli.command.XZ;
+import net.lab0.nebula.cli.command.XZcat;
 import net.lab0.nebula.exception.NonEmptyFolderException;
 import net.lab0.nebula.exception.ProjectException;
 import net.lab0.nebula.project.Project;
@@ -204,6 +204,7 @@ public class NebulaCLI
         addCommand(new Init());
         addCommand(new Import());
         addCommand(new Split());
+        addCommand(new Statistics());
         addCommand(new XZ());
         addCommand(new XZcat());
     }
@@ -315,7 +316,7 @@ public class NebulaCLI
     {
         VerboseLevel verbosity = null;
         // this happens when we want to print something before the main args are parsed
-        if (!opt.has(NebulaCLI.verbosity))
+        if (opt == null || !opt.has(NebulaCLI.verbosity))
         {
             verbosity = VerboseLevel.ALL;
         }
@@ -334,6 +335,10 @@ public class NebulaCLI
      */
     private static void logOutput(String s, VerboseLevel severity)
     {
+        //quick hardcoded disable
+        if (1==1){
+            return;
+        }
         switch (severity)
         {
             case ALL:

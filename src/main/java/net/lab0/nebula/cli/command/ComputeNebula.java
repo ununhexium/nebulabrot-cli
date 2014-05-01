@@ -29,7 +29,6 @@ extends AbstractCommand
     private OptionSpec<Integer> yRes;
     private OptionSpec<Long>    maxIter;
     private OptionSpec<Long>    minIter;
-    private OptionSpec<String>  imageName;
     
     private OptionSpec<Integer> sum;
     
@@ -54,9 +53,6 @@ extends AbstractCommand
         
         minIter = parser.accepts("min-iter", "The minimum iteration to reach while computing").withRequiredArg()
         .ofType(Long.class).defaultsTo(-1L);
-        
-        imageName = parser.accepts("name", "The name to give to the ouput image").withRequiredArg()
-        .ofType(String.class).defaultsTo("final");
         
         sum = parser.accepts("sum", "Sums a set of nebulabrot renderings").withRequiredArg().ofType(Integer.class);
     }
@@ -104,7 +100,7 @@ extends AbstractCommand
         try
         {
             project.computeNebula(pointsId.value(opt), viewPort, xRes.value(opt), yRes.value(opt), minIter.value(opt),
-            maxIter.value(opt), imageName.value(opt));
+            maxIter.value(opt));
         }
         catch (Exception e)
         {
